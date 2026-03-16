@@ -15,11 +15,7 @@ connectDB();
 app.set("trust proxy",1);
 app.use(express.json());
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://notes-application-xi-ivory.vercel.app",
-    "https://api.notes.bharatjoshi.xyz/api"
-  ],
+  origin: process.env.CLIENT_URL,
   credentials: true
 }));
 app.use(passport.initialize());
