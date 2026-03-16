@@ -4,7 +4,7 @@ import { generateOTP } from "../utils/otpGenerator.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pendingUser from "../models/pendingUser.js";
-
+import { sendEmail } from "../utils/sendEmail.js";
  // Registration
 export const register = async (req,res)=>{
  try {
@@ -45,6 +45,12 @@ export const register = async (req,res)=>{
   //   subject: "Verify Your Account",
   //   html: `<h2>Your OTP: ${otp}</h2>`
   // });
+
+  sendEmail(
+    email,
+    "Verify Your Account",
+    `<h2>Your OTP: ${otp}</h2>`
+  )
 
   res.json({
    message:"OTP sent to your email"
