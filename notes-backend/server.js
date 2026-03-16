@@ -17,7 +17,9 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://notes-application-xi-ivory.vercel.app"],
+    "https://notes-application-xi-ivory.vercel.app",
+    "https://api.notes.bharatjoshi.xyz/api"
+  ],
   credentials: true
 }));
 app.use(passport.initialize());
