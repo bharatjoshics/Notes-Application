@@ -1,26 +1,16 @@
-import axios from "axios";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendEmail = async (to, subject, html) => {
   try {
-    await axios.post(
-      "https://send.api.mailtrap.io/api/send",
-      {
-        from: {
-          email: "hello@notesapp.com",
-          name: "Notes App"
-        },
-        to: [{ email: to }],
-        subject,
-        html
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.MAILTRAP_TOKEN}`,
-          "Content-Type": "application/json"
-        }
-      }
-    );
-  } catch (err) {
-    console.error("Email sending failed:", err.message);
+    await resend.emails.send({
+      from: "Notes App <auth@bharatjoshi.xyz>",
+      to: [to],
+      subject: subject,
+      html: html
+    });
+  } catch (error) {
+    console.error("Email sending failed:", error);
   }
 };

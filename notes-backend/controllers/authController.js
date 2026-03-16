@@ -49,8 +49,9 @@ export const register = async (req,res)=>{
   sendEmail(
     email,
     "Verify Your Account",
-    `<h2>Your OTP: ${otp}</h2>`
-  )
+    `<h2>Your OTP: ${otp}</h2>
+    <p>This OTP will expire in 10 mins. </p>`
+  );
 
   res.json({
    message:"OTP sent to your email"
