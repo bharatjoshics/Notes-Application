@@ -13,6 +13,10 @@ import helmet from "helmet";
 const app = express();
 connectDB();
 app.use(express.json());
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 app.use(passport.initialize());
 app.use(helmet());
 
@@ -24,10 +28,6 @@ const authLimiter = rateLimit({
   }
 });
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
-}));
 app.use("/api/notes", noteRoutes);
 app.use("/api/auth",authLimiter, authRoutes);
 
