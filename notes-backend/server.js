@@ -14,7 +14,9 @@ const app = express();
 connectDB();
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: [
+    "http://localhost:5173",
+    "https://notes-application-xi-ivory.vercel.app"],
   credentials: true
 }));
 app.use(passport.initialize());
