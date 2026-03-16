@@ -165,11 +165,18 @@ export const forgotPassword = async (req,res) => {
 
  await user.save();
 
- await transporter.sendMail({
-  to: user.email,
-  subject: "Password Reset OTP",
-  html: `<h1>Your OTP is: ${otp}</h1>`
- });
+//  await transporter.sendMail({
+//   to: user.email,
+//   subject: "Password Reset OTP",
+//   html: `<h1>Your OTP is: ${otp}</h1>`
+//  });
+
+sendEmail(
+    email,
+    "Verify For Reset Password",
+    `<h2>Your OTP: ${otp}</h2>
+    <p>This OTP will expire in 10 mins. </p>`
+  );
 
  res.json({
   message:"OTP sent to your email"
