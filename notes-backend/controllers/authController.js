@@ -40,6 +40,7 @@ export const register = async (req,res)=>{
   });
 
   await transporter.sendMail({
+    from: "Notes-app@mail.com",
     to: email,
     subject: "Verify Your Account",
     html: `<h2>Your OTP: ${otp}</h2>`

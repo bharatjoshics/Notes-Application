@@ -2,6 +2,8 @@ import express from "express";
 import { register, login, forgotPassword, verifyOTP, resetPassword, verifyRegisterOtp } from "../controllers/authController.js";
 import passport from "passport";
 import { OAuth2Client } from "google-auth-library";
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
