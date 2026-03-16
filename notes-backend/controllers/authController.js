@@ -39,12 +39,12 @@ export const register = async (req,res)=>{
     otpExpiry
   });
 
-  await transporter.sendMail({
-    from: "Notes-app@mail.com",
-    to: email,
-    subject: "Verify Your Account",
-    html: `<h2>Your OTP: ${otp}</h2>`
-  });
+  // await transporter.sendMail({
+  //   from: "Notes-app@mail.com",
+  //   to: email,
+  //   subject: "Verify Your Account",
+  //   html: `<h2>Your OTP: ${otp}</h2>`
+  // });
 
   res.json({
    message:"OTP sent to your email"

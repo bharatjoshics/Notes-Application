@@ -12,6 +12,7 @@ import helmet from "helmet";
 
 const app = express();
 connectDB();
+app.set("trust proxy",1);
 app.use(express.json());
 app.use(cors({
   origin: [
