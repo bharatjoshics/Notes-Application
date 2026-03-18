@@ -6,6 +6,7 @@ import { getNotes, createNote, deleteNote, updateNote } from "../services/noteSe
 import { useNavigate } from "react-router-dom";
 import NoteSkeleton from "../components/NoteSkeleton";
 import { exportAllNotesToPDF } from "../utils/pdfExport";
+import { getKey, encryptContent, decryptContent } from "../utils/e2eCrypto";
 
 function NotesPage(){
 
@@ -58,18 +59,34 @@ const user = getUser();
 
  const fetchNotes = async () => {
   try {
-    setLoading(true);
+    const key = await getKey();
     const data = await getNotes();
-    setNotes(data);
+
+    const notes = await Promise.all(
+      data.map(async (note) => {
+        const isEncrypted =
+          typeof note.content === "object" &&
+          note.content?.iv &&
+          note.content?.content;
+
+        const content = isEncrypted
+          ? await decryptContent(note.content, key)
+          : typeof note.content === "string"
+            ? note.content : "";
+
+        return {
+          ...note,
+          content,        // ✅ ALWAYS STRING
+          isEncrypted     // ✅ TRUE/FALSE
+        };
+      })
+    );
+
+    setNotes(notes);
   } catch (err) {
-    if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      navigate("/login");
-    }
-  } finally {
-    setLoading(false);
+    console.error(err);
   }
- };
+};
 
  useEffect(()=>{
   fetchNotes();
@@ -78,8 +95,21 @@ const user = getUser();
  /* ---------------- CRUD OPERATIONS ---------------- */
 
  const handleCreate = async (note)=>{
-  const newNote = await createNote(note);
-  setNotes((prev)=>[newNote, ...prev]);
+  const key = await getKey();
+
+  const encryptedContent = await encryptContent(note.content, key);
+
+  const newNote = await createNote({
+    ...note,
+    content: encryptedContent
+  });
+
+  const newNoteForUI = {
+    ...newNote,
+    content: note.content,
+    isEncrypted: true
+  };
+  setNotes((prev)=>[newNoteForUI, ...prev]);
   toast.success("Note created!");
  };
 
@@ -98,12 +128,33 @@ const user = getUser();
   setEditingNote(note);
  };
 
- const handleUpdate = async (note)=>{
-  await updateNote(editingNote._id,note);
+ const handleUpdate = async (note) => {
+  const key = await getKey();
+
+  // ALWAYS encrypt before saving
+  const encryptedContent = await encryptContent(note.content, key);
+
+  await updateNote(editingNote._id, {
+    ...note,
+    content: encryptedContent // ✅ OBJECT goes to DB
+  });
+
+  const updatedNoteForUI = {
+    ...editingNote,
+    ...note,
+    content: note.content, // ✅ STRING for UI
+    isEncrypted: true      // ✅ because now it's encrypted
+  };
+
+  setNotes((prev) =>
+    prev.map((n) =>
+      n._id === editingNote._id ? updatedNoteForUI : n
+    )
+  );
+
   setEditingNote(null);
   toast.success("Note updated!");
-  fetchNotes();
- };
+};
 
  /* ---------------- SORTING ---------------- */
 
@@ -116,9 +167,15 @@ const user = getUser();
 
  /* ---------------- SEARCH ---------------- */
 
+ const getText = (field) => {
+  if(typeof field === "string")
+    return field;
+
+  return "";
+ };
+
  const filteredNotes = sortedNotes.filter((note)=>
-    note.title.toLowerCase().includes(search.toLowerCase()) ||
-    note.content.toLowerCase().includes(search.toLowerCase())
+    getText(note.title).toLowerCase().includes(search.toLowerCase())
 );
 
  /* ---------------- LOGOUT ---------------- */
@@ -210,7 +267,7 @@ const handleExportAllNotes = () => {
    />
 
     {loading ? (
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-6 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
             <NoteSkeleton key={i} />
             ))}

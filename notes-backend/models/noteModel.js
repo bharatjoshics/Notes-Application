@@ -1,12 +1,17 @@
 import mongoose from "mongoose";
 
+const encryptedFieldSchema = new mongoose.Schema({
+  iv: String,
+  content: String
+}, {_id: false});
+
 const noteSchema = new mongoose.Schema({
   title: {
-    type: String,
+    type: encryptedFieldSchema,
     required: true
   },
   content: {
-    type: String,
+    type: mongoose.Schema.Types.Mixed,
     required: true
   },
   user: {
@@ -14,7 +19,8 @@ const noteSchema = new mongoose.Schema({
     ref: "User",
     required: true
   }
-},{
+},
+{
   timestamps: true
 });
 

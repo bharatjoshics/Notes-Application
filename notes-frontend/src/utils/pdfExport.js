@@ -2,6 +2,16 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { marked } from "marked";
 
+const removeEmojis = (text = "") => {
+  return text
+    // remove emojis
+    .replace(/[\p{Extended_Pictographic}]/gu, "")
+    // remove variation selectors (like ️)
+    .replace(/\uFE0F/g, "")
+    // remove any leftover non-ASCII chars (final safety)
+    .replace(/[^\x00-\x7F]/g, "");
+}
+
 const renderMarkdownToPDF = (pdf, markdown, margin, y, textWidth, pageHeight) => {
 
   const tokens = marked.lexer(markdown);
@@ -17,7 +27,8 @@ const renderMarkdownToPDF = (pdf, markdown, margin, y, textWidth, pageHeight) =>
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(size);
 
-      const lines = pdf.splitTextToSize(token.text, textWidth);
+      const cleanHeading = removeEmojis(token.text);
+      const lines = pdf.splitTextToSize(cleanHeading, textWidth);
 
       lines.forEach(line => {
 
@@ -55,7 +66,7 @@ const renderMarkdownToPDF = (pdf, markdown, margin, y, textWidth, pageHeight) =>
           pdf.setFont("helvetica", fontStyle);
         }
 
-        const text = part.text || part.raw;
+        const text = removeEmojis(part.text || part.raw);
 
         const words = text.split(" ");
 
@@ -93,7 +104,8 @@ const renderMarkdownToPDF = (pdf, markdown, margin, y, textWidth, pageHeight) =>
 
         const bullet = token.ordered ? `${item.index + 1}.` : "•";
 
-        const lines = pdf.splitTextToSize(item.text, textWidth - 10);
+        const cleanItem = removeEmojis(item.text);
+        const lines = pdf.splitTextToSize(cleanItem, textWidth - 10);
 
         lines.forEach((line, i) => {
 
@@ -118,7 +130,8 @@ const renderMarkdownToPDF = (pdf, markdown, margin, y, textWidth, pageHeight) =>
       pdf.setFont("courier", "normal");
       pdf.setFontSize(11);
 
-      const lines = pdf.splitTextToSize(token.text, textWidth - 4);
+      const cleanCode = removeEmojis(token.text);
+      const lines = pdf.splitTextToSize(cleanCode, textWidth - 4);
 
       lines.forEach(line => {
 
@@ -151,7 +164,7 @@ const createStyledHTML = (title, date, markdown) => {
   ">
 
     <h1 style="font-size:32px;margin-bottom:10px;">
-      ${title}
+      ${removeEmojis(title)}
     </h1>
 
     <p style="color:gray;font-size:14px;margin-bottom:20px;">
@@ -162,7 +175,7 @@ const createStyledHTML = (title, date, markdown) => {
 
     <div style="margin-top:20px;font-size:16px;">
 
-      ${marked(markdown)}
+      ${marked(removeEmojis(markdown))}
 
     </div>
 
@@ -226,7 +239,7 @@ export const exportNoteToPDF = (note) => {
   let y = 20;
 
   pdf.setFontSize(20);
-  pdf.text(note.title, pageWidth / 2, y, { align: "center" });
+  pdf.text(removeEmojis(note.title), pageWidth / 2, y, { align: "center" });
 
   y += 10;
 
@@ -246,14 +259,14 @@ export const exportNoteToPDF = (note) => {
 
   y = renderMarkdownToPDF(
     pdf,
-    note.content,
+    removeEmojis(note.content),
     margin,
     y,
     textWidth,
     pageHeight
   );
 
-  pdf.save(`${note.title}.pdf`);
+  pdf.save(`${removeEmojis(note.title)}.pdf`);
 };
 
 export const exportAllNotesToPDF = (notes) => {
@@ -282,7 +295,7 @@ export const exportAllNotesToPDF = (notes) => {
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(16);
-    pdf.text(`${index + 1}. ${note.title}`, margin, y);
+    pdf.text(`${index + 1}. ${removeEmojis(note.title)}`, margin, y);
 
     y += 8;
 
@@ -302,7 +315,7 @@ export const exportAllNotesToPDF = (notes) => {
 
     y = renderMarkdownToPDF(
       pdf,
-      note.content,
+      removeEmojis(note.content),
       margin,
       y,
       textWidth,

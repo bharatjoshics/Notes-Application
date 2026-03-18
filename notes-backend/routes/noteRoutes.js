@@ -2,7 +2,8 @@ import express from 'express';
 import Note from '../models/noteModel.js';
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import client from "../utils/openaiClient.js";
-import { defaultMarkdownNote } from "../utils/defaultNote.js";
+import { defaultMarkdownNote, defaultNote } from "../utils/defaultNote.js";
+import { encrypt, safeDecrypt } from '../utils/encryption.js';
 
 const router = express.Router();
 
@@ -36,8 +37,11 @@ router.post("/summarize", authMiddleware, async (req,res)=>{
 
 });
 
+
+// Create Note
 router.post("/", authMiddleware, async (req,res)=>{
-    const {title,content} = req.body;
+    const title = encrypt(req.body.title);
+    const content = req.body.content;
     try{
         const note = await Note.create({
             title,
@@ -45,32 +49,55 @@ router.post("/", authMiddleware, async (req,res)=>{
             user: req.user.id
         });
 
-        res.json(note);
+        res.json({
+            ...note._doc,
+            title: safeDecrypt(note.title),
+            content: note.content
+        });
     }
     catch(err){
         res.status(500).json({message: err.message});
     }
 });
 
+
+// Fetch Notes
 router.get("/", authMiddleware, async (req,res) => {
     try{
         let notes = await Note.find({user: req.user.id}).sort({ createdAt: -1 });;
         if (notes.length === 0) {
-            const defaultNote = await Note.create({
-                user: req.user.id,
-                title: defaultMarkdownNote.title,
-                content: defaultMarkdownNote.content
-            });
-
-            notes = [defaultNote];
-            }
-        res.json(notes);
+            const defaultNotes = [
+        {
+          user: req.user.id,
+          title: encrypt(defaultMarkdownNote.title),
+          content: defaultMarkdownNote.content
+        },
+        {
+          user: req.user.id,
+          title: encrypt(defaultNote.title),
+          content: defaultNote.content
+        }
+      ];
+      const createdNotes = await Note.insertMany(defaultNotes);
+      notes = createdNotes;
+    }
+        
+    const decryptedNotes = notes.map((note)=>({
+        ...note._doc,
+        title: safeDecrypt(note.title),
+        content: note.content
+    }));
+        
+    res.json(decryptedNotes);
     }
     catch (err){
+        console.error(err);
         res.status(500).json({message: err.message});
     }    
-})
+});
 
+
+// Delete Note
 router.delete("/:id", authMiddleware, async (req,res)=>{
     try{
         await Note.findOneAndDelete({
@@ -84,14 +111,24 @@ router.delete("/:id", authMiddleware, async (req,res)=>{
     }
 });
 
+
+// Update Note
 router.put("/:id", authMiddleware, async (req,res)=>{
     try{
-        const note = await Note.findOneAndUpdate(
-            { _id:req.params.id, user:req.user.id },
-            req.body,
-            {returnDocument: "after"});
+        const updatedNote = await Note.findByIdAndUpdate(
+            req.params.id,
+            {
+                title: encrypt(req.body.title),
+                content: req.body.content,
+            },
+            { returnDocument: "after" }
+        );
 
-        res.json(note);
+        res.json({
+            ...updatedNote._doc,
+            title: safeDecrypt(updatedNote.title),
+            content: updatedNote.content
+        });
     }
     catch (err){
         res.status(500).json({message: err.message});

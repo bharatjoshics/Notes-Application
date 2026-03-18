@@ -136,3 +136,58 @@ Markdown makes writing notes simple and clean.
 Start writing your notes using Markdown and make them **clear, structured, and powerful**.
 `
 };
+
+
+export const defaultNote = {
+  title: "🔐 Encryption Info",
+  content: `# 🔐 Your Data is Secure
+
+This app uses **End-to-End Encryption (E2EE)** for note content.
+
+## 🛡️ What does this mean?
+
+- Your note **content is encrypted on your device**
+- Even the server **cannot read it**
+- Only you can decrypt it
+
+---
+
+## 🔐 About the Badge
+
+You may see a **🔐 E2EE Protected badge** on some notes.
+
+👉 This means:
+- The note content is **securely encrypted**
+- It is **stored safely in the database**
+- Only visible to you after decryption
+
+🟢 If a note has the badge → it is encrypted  
+⚪ If no badge → it is not encrypted yet
+
+---
+
+## ⚠️ Important Rule
+
+❌ Do NOT store sensitive data in the title  
+✅ Store it inside content
+
+---
+
+## ✅ Example Usage
+
+**Title:** Facebook Password  
+**Content:** password123  
+
+---
+
+## 🔍 Searching Notes
+
+Search works on **title only**
+
+So you can simply search:
+👉 Facebook Password
+
+---
+
+Stay secure 🔒`
+};

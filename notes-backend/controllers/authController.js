@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pendingUser from "../models/pendingUser.js";
 import { sendEmail } from "../utils/sendEmail.js";
+
  // Registration
 export const register = async (req,res)=>{
  try {

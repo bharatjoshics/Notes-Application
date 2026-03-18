@@ -28,13 +28,16 @@ function NoteItem({ note, onDelete, onEdit }) {
     };
 
  return (
-  <div id={`note-${note._id}`}
-  className="bg-white/80 dark:bg-gray-800/80 
+  <div
+    id={`note-${note._id}`}
+    className="w-full max-w-full overflow-hidden
+    bg-white/80 dark:bg-gray-800/80 
     backdrop-blur-sm
-    shadow-md rounded-xl p-6
+    shadow-md rounded-xl p-5 sm:p-6
     transition-all duration-300
     hover:-translate-y-1 hover:shadow-xl
-    border border-gray-200 dark:border-gray-700">
+    border border-gray-200 dark:border-gray-700"
+  >
 
     <h2 className="text-xl font-semibold mb-2">
       {note.title}
@@ -44,10 +47,21 @@ function NoteItem({ note, onDelete, onEdit }) {
         text-gray-700 
         dark:text-gray-300">
 
-        <div className= "prose dark:prose-invert max-w-none"> 
-            <div className={!expanded ? "line-clamp-3" : ""}>
-                <ReactMarkdown>{note.content}</ReactMarkdown>
-            </div>
+        <div className="prose dark:prose-invert max-w-none break-words">
+
+          {/* 🔐 Badge */}
+          {note.isEncrypted && (
+            <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">
+              🔐 E2EE Protected
+            </span>
+          )}
+
+          <div className={!expanded ? "line-clamp-3" : ""}>
+            <ReactMarkdown>
+              {note.content}
+            </ReactMarkdown>
+          </div>
+
         </div>
 
         {!expanded && (
@@ -71,35 +85,35 @@ function NoteItem({ note, onDelete, onEdit }) {
     </div>
 
     {/* Buttons Row */}
-    <div className="flex gap-3 flex-wrap mt-3">
+    <div className="flex flex-wrap gap-2 mt-3">
 
       <button
         onClick={handleSummarize}
-        className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
+        className="flex-1 sm:flex-none bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700"
       >
         {loadingSummary ? "Summarizing..." : "Summarize"}
       </button>
 
       <button
         onClick={() => onDelete(note._id)}
-        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+        className="flex-1 sm:flex-none bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
       >
         Delete
       </button>
 
       <button
         onClick={() => onEdit(note)}
-        className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+        className="flex-1 sm:flex-none bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
       >
         Edit
       </button>
 
       <button
         onClick={handleDownloadPDF}
-        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-       >
+        className="flex-1 sm:flex-none bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+      >
         Download PDF
-       </button>
+      </button>
 
     </div>
 

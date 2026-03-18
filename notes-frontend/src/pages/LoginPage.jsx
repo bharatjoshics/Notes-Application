@@ -13,23 +13,31 @@ function LoginPage(){
 
  const navigate = useNavigate();
 
- const handleLogin = async (e)=>{
+ const handleLogin = async (e) => {
   e.preventDefault();
 
-  try{
-    const data = await login({email,password});
-    localStorage.setItem("token",data.token);
-    localStorage.setItem("user",JSON.stringify(data.user));
-    navigate("/");
-  } catch(err){
-    const message = err.response?.data?.message || "Login Failed"
-    toast.error(message);
-  }
+  try {
+    const data = await login({ email, password });
+    
+    // 🔐 Generate stable passphrase (IMPORTANT)
+    const userWithPassphrase = {
+      ...data.user,
+      passphrase: data.user.email + "_cAOkL6UzaHZ7_" + data.user.id
+    };
 
- };
+    // ✅ Store token + user
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(userWithPassphrase));
+
+    navigate("/");
+    } catch (err) {
+        const message = err.response?.data?.message || "Login Failed";
+        toast.error(message);
+        }
+    };
 
  return(
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
 
     <form
         onSubmit={handleLogin}
