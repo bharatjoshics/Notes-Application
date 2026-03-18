@@ -79,7 +79,7 @@ function LoginPage(){
         <h3>Don't have an account? <span className="text-blue-700"><Link to="/register">Register</Link></span></h3>
     </div>
 
-    <GoogleLogin
+    {/* <GoogleLogin
         onSuccess={async (credentialResponse) => {
             try {
                 const res = await axiosClient.post("/auth/google-login", {
@@ -104,7 +104,7 @@ function LoginPage(){
                 toast.error("Google Login Failed");
             }
         }}
-    />
+    /> */}
 
     </form>
 

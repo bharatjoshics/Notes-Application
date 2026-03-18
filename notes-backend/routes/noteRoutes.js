@@ -67,20 +67,20 @@ router.get("/", authMiddleware, async (req,res) => {
         let notes = await Note.find({user: req.user.id}).sort({ createdAt: -1 });;
         if (notes.length === 0) {
             const defaultNotes = [
-        {
-          user: req.user.id,
-          title: encrypt(defaultMarkdownNote.title),
-          content: defaultMarkdownNote.content
-        },
-        {
-          user: req.user.id,
-          title: encrypt(defaultNote.title),
-          content: defaultNote.content
+                {
+                user: req.user.id,
+                title: encrypt(defaultMarkdownNote.title),
+                content: defaultMarkdownNote.content
+                },
+                {
+                user: req.user.id,
+                title: encrypt(defaultNote.title),
+                content: defaultNote.content
+                }
+            ];
+            const createdNotes = await Note.insertMany(defaultNotes);
+            notes = createdNotes;
         }
-      ];
-      const createdNotes = await Note.insertMany(defaultNotes);
-      notes = createdNotes;
-    }
         
     const decryptedNotes = notes.map((note)=>({
         ...note._doc,
