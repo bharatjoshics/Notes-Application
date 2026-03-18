@@ -22,7 +22,7 @@ function LoginPage(){
     // 🔐 Generate stable passphrase (IMPORTANT)
     const userWithPassphrase = {
       ...data.user,
-      passphrase: data.user.email + "_cAOkL6UzaHZ7_" + data.user.id
+      passphrase: btoa(data.user.email + "_cAOkL6UzaHZ7_" + data.user.id)
     };
 
     // ✅ Store token + user
@@ -91,7 +91,7 @@ function LoginPage(){
                 // 🔐 SAME passphrase logic (VERY IMPORTANT)
                 const userWithPassphrase = {
                     ...user,
-                    passphrase: user.email + "_cAOkL6UzaHZ7_" + data.user.id
+                    passphrase: btoa(user.email + "_cAOkL6UzaHZ7_" + user._id)
                 };
 
                 // ✅ store everything
