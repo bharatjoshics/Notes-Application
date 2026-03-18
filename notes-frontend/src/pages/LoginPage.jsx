@@ -80,19 +80,29 @@ function LoginPage(){
     </div>
 
     <GoogleLogin
-        onSuccess={async (credentialResponse)=>{
+        onSuccess={async (credentialResponse) => {
+            try {
+                const res = await axiosClient.post("/auth/google-login", {
+                    token: credentialResponse.credential
+                });
 
-        const res = await axiosClient.post("/auth/google-login",{
-        token:credentialResponse.credential
-        });
+                const user = res.data.user;
 
-        localStorage.setItem("token",res.data.token);
+                // 🔐 SAME passphrase logic (VERY IMPORTANT)
+                const userWithPassphrase = {
+                    ...user,
+                    passphrase: user.email + "_cAOkL6UzaHZ7_" + data.user.id
+                };
 
-        window.location.href="/";
+                // ✅ store everything
+                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("user", JSON.stringify(userWithPassphrase));
 
-        }}
-        onError={()=>{
-        console.log("Google Login Failed");
+                navigate("/"); // ✅ better than window.location
+            } catch (err) {
+                console.error(err);
+                toast.error("Google Login Failed");
+            }
         }}
     />
 

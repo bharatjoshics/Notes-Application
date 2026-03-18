@@ -31,7 +31,8 @@ router.post("/google-login", async (req,res)=>{
    user = await User.create({
     name,
     email,
-    password:"google-login"
+    password:"google-login",
+    googleAuth: true
    });
 
   }
