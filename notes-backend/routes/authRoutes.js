@@ -4,6 +4,7 @@ import passport from "passport";
 import { OAuth2Client } from "google-auth-library";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { generateUsername } from "../utils/generateUsername.js";
 
 const router = express.Router();
 
@@ -27,12 +28,13 @@ router.post("/google-login", async (req,res)=>{
   let user = await User.findOne({email});
 
   if(!user){
-
-   user = await User.create({
-    name,
-    email,
-    password:"google-login",
-    googleAuth: true
+    const username = await generateUsername(email);
+    user = await User.create({
+        name,
+        email,
+        username,
+        password:"google-login",
+        googleAuth: true
    });
 
   }
