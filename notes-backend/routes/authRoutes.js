@@ -48,7 +48,7 @@ router.post("/google-login", async (req,res)=>{
   res.json({token:jwtToken,user});
 
  }catch(err){
-
+  console.error("Google Login Error: ", err);
   res.status(500).json({
    message:"Google login failed"
   });
