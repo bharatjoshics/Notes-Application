@@ -10,7 +10,7 @@ function ResetPasswordPage(){
  const location = useLocation();
  const navigate = useNavigate();
 
- const email = location.state?.email;
+ const userid = location.state?.userid;
 
  const handleSubmit = async(e)=>{
   e.preventDefault();
@@ -18,7 +18,7 @@ function ResetPasswordPage(){
   try{
 
    await axiosClient.post("/auth/reset-password",{
-    email,
+    userid,
     password
    });
 

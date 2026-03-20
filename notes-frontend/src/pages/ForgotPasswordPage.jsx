@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function ForgotPasswordPage() {
 
-  const [email,setEmail] = useState("");
+  const [userid,setUserid] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,11 +13,11 @@ function ForgotPasswordPage() {
 
     try {
 
-      await axiosClient.post("/auth/forgot-password",{email});
+      await axiosClient.post("/auth/forgot-password",{userid});
 
-      toast.success("OTP sent to your email");
+      toast.success("OTP sent to your Registered Email");
 
-      navigate("/verify-otp",{state:{email}});
+      navigate("/verify-otp",{state:{userid}});
 
     } catch (err) {
 
@@ -42,10 +42,10 @@ function ForgotPasswordPage() {
         </h2>
 
         <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
+          type="text"
+          placeholder="Enter your Username or Registered Email"
+          value={userid}
+          onChange={(e)=>setUserid(e.target.value)}
           className="w-full p-2 border rounded mb-4"
           required
         />

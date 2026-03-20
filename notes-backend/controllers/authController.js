@@ -1,5 +1,4 @@
 import User from "../models/User.js";
-import transporter from "../config/mailer.js";
 import { generateOTP } from "../utils/otpGenerator.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -10,20 +9,27 @@ import { sendEmail } from "../utils/sendEmail.js";
 export const register = async (req,res)=>{
  try {
 
-  const { name, email, password } = req.body || {};
+  const { name, username, email, password } = req.body || {};
 
-  if(!name || !email || !password){
+  if(!name || !username || !email || !password){
    return res.status(400).json({
     message:"All fields are required"
    });
   }
 
   const existingUser = await User.findOne({email});
+  const usernameUnavailable = await User.findOne({username});
 
   if(existingUser){
    return res.status(400).json({
     message:"User already exists"
    });
+  }
+
+  if(usernameUnavailable){
+    return res.status(400).json({
+      message: "Username is not available. Please try different Username"
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password,10);
@@ -34,6 +40,7 @@ export const register = async (req,res)=>{
 
   await pendingUser.create({
     name,
+    username,
     email,
     password: hashedPassword,
     otp,
@@ -96,6 +103,7 @@ export const verifyRegisterOtp = async (req,res)=>{
 
   await User.create({
    name: pU.name,
+   username: pU.username,
    email: pU.email,
    password: pU.password,
   });
@@ -117,12 +125,23 @@ export const verifyRegisterOtp = async (req,res)=>{
 // Login
 export const login = async (req,res)=>{
 
- const {email,password} = req.body;
+ const {userid,password} = req.body;
 
- const user = await User.findOne({email});
+ const userByUsername = await User.findOne({username: userid}) 
+ const userByEmail = await User.findOne({email: userid});
+ let user = "";
+
+ if(userByUsername){
+  user = userByUsername;
+ }
+ else{
+  user = userByEmail;
+ }
+
  if(!user){
   return res.status(400).json({message:"Invalid credentials"});
  }
+
 
  const isMatch = await bcrypt.compare(password,user.password);
 
@@ -139,6 +158,7 @@ export const login = async (req,res)=>{
  res.json({token, 
     user: {
         id: user._id,
+        username: user.username,
         name: user.name,
         email: user.email
     }
@@ -149,15 +169,26 @@ export const login = async (req,res)=>{
 //Forget Password
 export const forgotPassword = async (req,res) => {
 
- const { email } = req.body;
+ const { userid } = req.body;
 
- const user = await User.findOne({email});
+ const userByUsername = await User.findOne({username: userid});
+ const userByEmail = await User.findOne({email: userid});
+ let user = "";
+
+ if(userByUsername){
+  user = userByUsername;
+ }
+ else{
+  user = userByEmail;
+ }
 
  if(!user){
   return res.status(404).json({
    message:"User not found"
   });
  }
+
+ const email = user.email;
 
  const otp = generateOTP();
 
@@ -180,7 +211,7 @@ sendEmail(
   );
 
  res.json({
-  message:"OTP sent to your email"
+  message:"OTP sent to your Registered Email"
  });
 };
 
@@ -188,9 +219,18 @@ sendEmail(
 //Verify OTP
 export const verifyOTP = async (req,res)=>{
 
- const {email,otp} = req.body;
+ const {userid,otp} = req.body;
 
- const user = await User.findOne({email});
+ const userByUsername = await User.findOne({username: userid});
+ const userByEmail = await User.findOne({email: userid});
+ let user = "";
+
+ if(userByUsername){
+  user = userByUsername;
+ }
+ else{
+  user = userByEmail;
+ }
 
  if(!user){
   return res.status(404).json({
@@ -220,9 +260,18 @@ export const verifyOTP = async (req,res)=>{
 //Reset Password
 export const resetPassword = async (req,res)=>{
 
- const {email,password} = req.body;
+ const {userid,password} = req.body;
 
- const user = await User.findOne({email});
+ const userByUsername = await User.findOne({username: userid});
+ const userByEmail = await User.findOne({email: userid});
+ let user = "";
+
+ if(userByUsername){
+  user = userByUsername;
+ }
+ else{
+  user = userByEmail;
+ }
 
  const hashedPassword = await bcrypt.hash(password,10);
 

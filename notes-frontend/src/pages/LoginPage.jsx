@@ -8,7 +8,7 @@ import axiosClient from "../api/axiosClient";
 
 function LoginPage(){
 
- const [email,setEmail] = useState("");
+ const [userid,setUserid] = useState("");
  const [password,setPassword] = useState("");
 
  const navigate = useNavigate();
@@ -17,7 +17,7 @@ function LoginPage(){
   e.preventDefault();
 
   try {
-    const data = await login({ email, password });
+    const data = await login({ userid, password });
     
     // 🔐 Generate stable passphrase (IMPORTANT)
     const userWithPassphrase = {
@@ -47,10 +47,10 @@ function LoginPage(){
     <h2 className="text-xl font-bold mb-4 text-center">Login</h2>
 
     <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e)=>setEmail(e.target.value)}
+        type="text"
+        placeholder="Username or Email"
+        value={userid}
+        onChange={(e)=>setUserid(e.target.value)}
         className="w-full border p-2 mb-3 rounded"
     />
 

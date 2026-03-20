@@ -10,18 +10,18 @@ function VerifyOTPPage(){
  const location = useLocation();
  const navigate = useNavigate();
 
- const email = location.state?.email;
+ const userid = location.state?.userid;
 
  const handleSubmit = async(e)=>{
   e.preventDefault();
 
   try{
 
-   await axiosClient.post("/auth/verify-otp",{email,otp});
+   await axiosClient.post("/auth/verify-otp",{userid,otp});
 
    toast.success("OTP verified");
 
-   navigate("/reset-password",{state:{email}});
+   navigate("/reset-password",{state:{userid}});
 
   }catch(err){
 
