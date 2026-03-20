@@ -19,7 +19,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(passport.initialize());
-app.use(helmet());
+app.use(helmet({crossOriginOpenerPolicy: false}));
 
 const authLimiter = rateLimit({
   windowMs: 15*60*1000,
