@@ -220,7 +220,7 @@ const handleExportAllNotes = () => {
     </div>
 
    <h1 className="text-4xl font-bold text-center mb-8">
-    Notes App
+    Vault Notes
    </h1>
 
     <button
